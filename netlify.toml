@@ -1,0 +1,34 @@
+# =====================================================================
+# Configuración de Netlify para Finca La Clementina
+# Next.js 15 App Router. El plugin oficial @netlify/plugin-nextjs
+# se instala automáticamente cuando detecta Next.js.
+# =====================================================================
+
+[build]
+  # Build desde la raíz del proyecto (esta carpeta).
+  command = "npm run build"
+  # Next.js publica a .next por convención.
+  publish = ".next"
+
+[build.environment]
+  # Versión de Node consistente con .nvmrc y package.json engines.
+  NODE_VERSION = "20"
+  # Evita que npm intente correr scripts de los packages al instalar.
+  NPM_FLAGS = "--no-audit --no-fund"
+
+# Opcional: forzar redirección de www → apex (o viceversa).
+# Lo dejo comentado; lo activas en Netlify → Domain settings.
+# [[redirects]]
+#   from = "https://www.fincalaclementina.com/*"
+#   to = "https://fincalaclementina.com/:splat"
+#   status = 301
+#   force = true
+
+# Headers de seguridad básicos para todo el sitio.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"

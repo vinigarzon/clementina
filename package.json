@@ -1,0 +1,46 @@
+{
+  "name": "finca-la-clementina",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.0.0 <25.0.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "setup-admin": "node scripts/setup-admin.mjs",
+    "copy-migration": "node scripts/copy-migration.mjs",
+    "check-blog": "node scripts/check-blog.mjs",
+    "gallery-cleanup": "node scripts/gallery-cleanup.mjs"
+  },
+  "dependencies": {
+    "@react-pdf/renderer": "^4.1.5",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.46.2",
+    "@tiptap/extension-link": "^2.10.3",
+    "@tiptap/extension-placeholder": "^2.10.3",
+    "@tiptap/pm": "^2.10.3",
+    "@tiptap/react": "^2.10.3",
+    "@tiptap/starter-kit": "^2.10.3",
+    "heic2any": "^0.0.4",
+    "next": "15.3.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "recharts": "^3.8.1",
+    "resend": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.18.0",
+    "eslint-config-next": "15.3.1",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.0"
+  }
+}
