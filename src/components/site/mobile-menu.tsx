@@ -18,7 +18,12 @@ const navItems = [
   { href: "/contacto", labelKey: "nav.contact" },
 ];
 
-export function MobileMenu() {
+interface MobileMenuProps {
+  /** Si el header está en estado scrolled, usa color oscuro para el botón hamburguesa. */
+  scrolled?: boolean;
+}
+
+export function MobileMenu({ scrolled = false }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
   const t = useT();
   const pathname = usePathname();
@@ -58,7 +63,9 @@ export function MobileMenu() {
         onClick={() => setOpen(true)}
         aria-label="Abrir menú"
         aria-expanded={open}
-        className="lg:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 text-cream-50"
+        className={`lg:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 transition-colors ${
+          scrolled ? "text-clementina-800" : "text-cream-50"
+        }`}
       >
         <span className="w-6 h-px bg-current" />
         <span className="w-6 h-px bg-current" />
