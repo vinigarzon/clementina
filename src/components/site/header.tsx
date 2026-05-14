@@ -42,7 +42,7 @@ export function Header() {
       className={cn(
         "fixed top-0 left-0 right-0 z-30 transition-all duration-300",
         scrolled
-          ? "py-2.5 bg-cream-50/95 backdrop-blur-md shadow-sm border-b border-clementina-100/60"
+          ? "py-3.5 bg-cream-50/95 backdrop-blur-md shadow-sm border-b border-clementina-100/60"
           : "py-5 bg-transparent",
       )}
     >
@@ -66,7 +66,7 @@ export function Header() {
               priority
               className={cn(
                 "w-auto transition-all duration-300",
-                scrolled ? "h-10 sm:h-11" : "h-14 sm:h-16",
+                scrolled ? "h-8 sm:h-9" : "h-14 sm:h-16",
               )}
             />
           </Link>
