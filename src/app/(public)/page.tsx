@@ -20,14 +20,18 @@ export default async function HomePage() {
       }))}
       eventTypes={eventTypes.map((t) => ({
         slug: t.slug,
-        title: t.title_es,
-        short: t.short_es,
+        title_es: t.title_es,
+        title_en: t.title_en ?? t.title_es,
+        short_es: t.short_es,
+        short_en: t.short_en ?? t.short_es,
         image: t.image_url,
       }))}
       latestPosts={posts.slice(0, 3).map((p) => ({
         slug: p.slug,
-        title: p.title_es,
-        excerpt: p.excerpt_es,
+        title_es: p.title_es,
+        title_en: p.title_en ?? p.title_es,
+        excerpt_es: p.excerpt_es,
+        excerpt_en: p.excerpt_en ?? p.excerpt_es,
         cover_url: p.cover_url,
         category: p.category,
         published_at: p.published_at,

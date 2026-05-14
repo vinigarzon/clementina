@@ -1,6 +1,7 @@
 "use client";
 
 import { useSiteSettings } from "@/components/site/site-settings-provider";
+import { useLocale } from "@/i18n/locale-context";
 
 interface WhatsappFabProps {
   message?: string;
@@ -10,11 +11,15 @@ interface WhatsappFabProps {
  * Botón flotante de WhatsApp. Persistente en todo el sitio.
  * El mensaje se puede personalizar por página pasando el prop `message`.
  */
-export function WhatsappFab({
-  message = "Hola, me interesa conocer más sobre Finca La Clementina para mi evento.",
-}: WhatsappFabProps) {
+export function WhatsappFab({ message }: WhatsappFabProps) {
   const { whatsapp_number } = useSiteSettings();
-  const url = `https://wa.me/${whatsapp_number}?text=${encodeURIComponent(message)}`;
+  const { locale } = useLocale();
+  const defaultMessage =
+    locale === "en"
+      ? "Hi, I'd like to know more about Finca La Clementina for my event."
+      : "Hola, me interesa conocer más sobre Finca La Clementina para mi evento.";
+  const finalMessage = message ?? defaultMessage;
+  const url = `https://wa.me/${whatsapp_number}?text=${encodeURIComponent(finalMessage)}`;
 
   return (
     <a

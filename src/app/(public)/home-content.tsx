@@ -3,21 +3,25 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/container";
-import { useT } from "@/i18n/locale-context";
+import { useT, useLocale } from "@/i18n/locale-context";
 import { HeroCarousel } from "@/components/home/hero-carousel";
 import { QuoteSection } from "@/components/home/quote-section";
 
 interface HomeEventType {
   slug: string;
-  title: string;
-  short: string;
+  title_es: string;
+  title_en: string;
+  short_es: string;
+  short_en: string;
   image: string | null;
 }
 
 interface HomeBlogPost {
   slug: string;
-  title: string;
-  excerpt: string | null;
+  title_es: string;
+  title_en: string;
+  excerpt_es: string | null;
+  excerpt_en: string | null;
   cover_url: string | null;
   category: string | null;
   published_at: string;
@@ -29,20 +33,22 @@ interface HomeContentProps {
   latestPosts: HomeBlogPost[];
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("es-EC", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
 export function HomeContent({
   featuredImages,
   eventTypes,
   latestPosts,
 }: HomeContentProps) {
   const t = useT();
+  const { locale } = useLocale();
+  const isEn = locale === "en";
+
+  function formatDate(iso: string): string {
+    return new Date(iso).toLocaleDateString(isEn ? "en-US" : "es-EC", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
 
   const heroImages =
     featuredImages.length > 0
@@ -149,36 +155,40 @@ export function HomeContent({
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {eventTypes.slice(0, 6).map((event) => (
-                <Link
-                  key={event.slug}
-                  href={`/tipos-de-eventos/${event.slug}`}
-                  className="group block rounded-2xl overflow-hidden bg-cream-50 hover:shadow-xl transition-all"
-                >
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    {event.image && (
-                      <Image
-                        src={event.image}
-                        alt={event.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      />
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-clementina-900/60 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="font-display text-2xl text-cream-50 mb-1">
-                        {event.title}
-                      </h3>
+              {eventTypes.slice(0, 6).map((event) => {
+                const eTitle = isEn ? event.title_en : event.title_es;
+                const eShort = isEn ? event.short_en : event.short_es;
+                return (
+                  <Link
+                    key={event.slug}
+                    href={`/tipos-de-eventos/${event.slug}`}
+                    className="group block rounded-2xl overflow-hidden bg-cream-50 hover:shadow-xl transition-all"
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      {event.image && (
+                        <Image
+                          src={event.image}
+                          alt={eTitle}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-clementina-900/60 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                        <h3 className="font-display text-2xl text-cream-50 mb-1">
+                          {eTitle}
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-6">
-                    <p className="font-sans text-sm text-clementina-900/70 leading-relaxed">
-                      {event.short}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+                    <div className="p-6">
+                      <p className="font-sans text-sm text-clementina-900/70 leading-relaxed">
+                        {eShort}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
 
             <div className="text-center mt-12">
@@ -203,17 +213,17 @@ export function HomeContent({
             <div className="flex flex-wrap items-end justify-between gap-6 mb-12">
               <div>
                 <p className="font-sans text-xs uppercase tracking-[0.3em] text-clementina-600 mb-4">
-                  Inspiración
+                  {t("blog.hero.eyebrow")}
                 </p>
                 <h2 className="font-display text-4xl md:text-5xl text-clementina-800 leading-tight max-w-xl">
-                  Ideas para tu evento
+                  {t("blog.hero.title")}
                 </h2>
               </div>
               <Link
                 href="/blog"
                 className="inline-flex items-center gap-2 font-sans text-sm font-medium text-clementina-700 hover:text-clementina-900 transition-colors group"
               >
-                Ver todo el blog
+                {t("common.viewAll")}
                 <span className="transition-transform group-hover:translate-x-1">
                   →
                 </span>
@@ -221,45 +231,51 @@ export function HomeContent({
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {latestPosts.slice(0, 3).map((post) => (
-                <Link
-                  key={post.slug}
-                  href={`/blog/${post.slug}`}
-                  className="group block rounded-2xl overflow-hidden bg-cream-50 hover:shadow-xl transition-all"
-                >
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    {post.cover_url ? (
-                      <Image
-                        src={post.cover_url}
-                        alt={post.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-clementina-200 to-clementina-400" />
-                    )}
-                    {post.category && (
-                      <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-cream-50/95 backdrop-blur font-sans text-[10px] uppercase tracking-widest text-clementina-700">
-                        {post.category}
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <p className="font-sans text-xs uppercase tracking-widest text-clementina-600 mb-3">
-                      {formatDate(post.published_at)}
-                    </p>
-                    <h3 className="font-display text-2xl text-clementina-800 leading-tight mb-3 group-hover:text-clementina-700 transition-colors">
-                      {post.title}
-                    </h3>
-                    {post.excerpt && (
-                      <p className="font-sans text-sm text-clementina-900/70 leading-relaxed line-clamp-3">
-                        {post.excerpt}
+              {latestPosts.slice(0, 3).map((post) => {
+                const pTitle = isEn ? post.title_en : post.title_es;
+                const pExcerpt = isEn
+                  ? post.excerpt_en ?? post.excerpt_es
+                  : post.excerpt_es;
+                return (
+                  <Link
+                    key={post.slug}
+                    href={`/blog/${post.slug}`}
+                    className="group block rounded-2xl overflow-hidden bg-cream-50 hover:shadow-xl transition-all"
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      {post.cover_url ? (
+                        <Image
+                          src={post.cover_url}
+                          alt={pTitle}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-clementina-200 to-clementina-400" />
+                      )}
+                      {post.category && (
+                        <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-cream-50/95 backdrop-blur font-sans text-[10px] uppercase tracking-widest text-clementina-700">
+                          {post.category}
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-6">
+                      <p className="font-sans text-xs uppercase tracking-widest text-clementina-600 mb-3">
+                        {formatDate(post.published_at)}
                       </p>
-                    )}
-                  </div>
-                </Link>
-              ))}
+                      <h3 className="font-display text-2xl text-clementina-800 leading-tight mb-3 group-hover:text-clementina-700 transition-colors">
+                        {pTitle}
+                      </h3>
+                      {pExcerpt && (
+                        <p className="font-sans text-sm text-clementina-900/70 leading-relaxed line-clamp-3">
+                          {pExcerpt}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </Container>
         </section>

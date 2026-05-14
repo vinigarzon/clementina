@@ -33,10 +33,6 @@ export async function generateMetadata({
   };
 }
 
-/**
- * Mapeo de slug → tag de galería. Si un slug coincide con un tag
- * usado en gallery_assets, mostramos las fotos relacionadas.
- */
 const SLUG_TO_GALLERY_TAG: Record<string, string> = {
   bodas: "Bodas",
   "quince-anos": "Quinces",
@@ -60,17 +56,25 @@ export default async function EventTypePage({ params }: PageProps) {
     getGalleryByTag(tag),
   ]);
 
-  // Body puede venir como Markdown (legacy) o HTML (editor nuevo)
-  const rawBody = (event as { body_es?: string | null }).body_es ?? "";
-  const bodyHtml = rawBody
-    ? isHtml(rawBody)
-      ? sanitizeBlogHtml(rawBody)
-      : markdownFallbackToHtml(rawBody)
+  // Body Markdown legacy o HTML nuevo — sanitizamos ambos lados.
+  const rawBodyEs = (event as { body_es?: string | null }).body_es ?? "";
+  const rawBodyEn = (event as { body_en?: string | null }).body_en ?? "";
+  const bodyHtmlEs = rawBodyEs
+    ? isHtml(rawBodyEs)
+      ? sanitizeBlogHtml(rawBodyEs)
+      : markdownFallbackToHtml(rawBodyEs)
+    : null;
+  const bodyHtmlEn = rawBodyEn
+    ? isHtml(rawBodyEn)
+      ? sanitizeBlogHtml(rawBodyEn)
+      : markdownFallbackToHtml(rawBodyEn)
     : null;
 
-  // WhatsApp message custom del evento si existe
-  const whatsappMessage =
+  const whatsappMessageEs =
     (event as { whatsapp_message_es?: string | null }).whatsapp_message_es ??
+    null;
+  const whatsappMessageEn =
+    (event as { whatsapp_message_en?: string | null }).whatsapp_message_en ??
     null;
 
   return (
@@ -78,23 +82,33 @@ export default async function EventTypePage({ params }: PageProps) {
       event={{
         slug: event.slug,
         title_es: event.title_es,
+        title_en: event.title_en ?? event.title_es,
         short_es: event.short_es,
+        short_en: event.short_en ?? event.short_es,
         description_es: event.description_es,
+        description_en: event.description_en ?? event.description_es,
         highlights_es: event.highlights_es ?? [],
+        highlights_en:
+          (event as { highlights_en?: string[] | null }).highlights_en ??
+          event.highlights_es ??
+          [],
         image_url: event.image_url,
-        whatsappMessage,
-        bodyHtml,
+        whatsappMessageEs,
+        whatsappMessageEn,
+        bodyHtmlEs,
+        bodyHtmlEn,
       }}
       others={others.map((o) => ({
         id: o.id,
         slug: o.slug,
         title_es: o.title_es,
+        title_en: o.title_en ?? o.title_es,
         image_url: o.image_url,
       }))}
       gallery={gallery.map((g) => ({
         src: g.image_url,
-        alt: g.alt_es,
-        caption: g.alt_es,
+        alt_es: g.alt_es,
+        alt_en: g.alt_en ?? g.alt_es,
       }))}
     />
   );
