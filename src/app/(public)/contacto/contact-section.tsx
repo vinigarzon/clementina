@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/site/page-hero";
 import { useSiteSettings } from "@/components/site/site-settings-provider";
-import { useT } from "@/i18n/locale-context";
+import { useT, useLocale } from "@/i18n/locale-context";
 import {
   RecaptchaLoader,
   executeRecaptcha,
@@ -22,6 +22,7 @@ interface ContactSectionProps {
 
 export function ContactSection({ eventTypeOptions }: ContactSectionProps) {
   const t = useT();
+  const { locale } = useLocale();
   const settings = useSiteSettings();
   const whatsappUrl = `https://wa.me/${settings.whatsapp_number}?text=${encodeURIComponent(
     t("contact.whatsappDefault"),
@@ -53,6 +54,7 @@ export function ContactSection({ eventTypeOptions }: ContactSectionProps) {
       const res = await submitLead({
         ...form,
         recaptcha_token: token ?? undefined,
+        locale,
       });
       if (!res.ok) {
         setError(res.error ?? t("contact.error.generic"));
@@ -258,10 +260,6 @@ export function ContactSection({ eventTypeOptions }: ContactSectionProps) {
                       ? t("contact.form.submitting")
                       : t("contact.form.submit")}
                   </button>
-
-                  <p className="font-sans text-[10px] text-clementina-900/50 leading-relaxed">
-                    {t("contact.form.recaptcha")}
-                  </p>
                 </form>
               )}
             </div>

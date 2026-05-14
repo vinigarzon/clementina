@@ -123,7 +123,37 @@ export function Footer() {
             </Link>
           </div>
         </div>
+
+        {/* Aviso reCAPTCHA (requerido por Google al ocultar el badge) */}
+        <RecaptchaNotice />
       </Container>
     </footer>
+  );
+}
+
+function RecaptchaNotice() {
+  const t = useT();
+  return (
+    <p className="mt-6 font-sans text-[10px] text-cream-100/45 leading-relaxed max-w-2xl">
+      {t("footer.recaptcha")}{" "}
+      <a
+        href="https://policies.google.com/privacy"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:text-cream-50/80"
+      >
+        Privacy Policy
+      </a>
+      {" · "}
+      <a
+        href="https://policies.google.com/terms"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:text-cream-50/80"
+      >
+        Terms of Service
+      </a>
+      .
+    </p>
   );
 }

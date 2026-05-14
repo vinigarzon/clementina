@@ -1,7 +1,11 @@
 /**
  * Templates HTML para emails del formulario de contacto.
- * HTML inline simple para máxima compatibilidad con clientes de correo.
+ * Bilingüe: el email que recibe el cliente sale en el idioma que
+ * tenía el sitio cuando llenó el form. El email interno (al equipo)
+ * siempre va en español.
  */
+
+export type EmailLocale = "es" | "en";
 
 export interface LeadEmailData {
   full_name: string;
@@ -28,11 +32,13 @@ const baseStyles = `
   line-height: 1.5;
 `;
 
-function wrap(body: string): string {
-  // URL absoluta para que el logo se vea en clientes de correo.
-  // Configurable vía NEXT_PUBLIC_SITE_URL en producción.
+function wrap(body: string, footerLocale: EmailLocale = "es"): string {
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://fincalaclementina.com").replace(/\/$/, "");
   const logoUrl = `${siteUrl}/logos/logo-white.png`;
+  const footerText =
+    footerLocale === "en"
+      ? "Vía El Carrizal, Parroquia Urbina, Tulcán, Ecuador"
+      : "Vía El Carrizal, Parroquia Urbina, Tulcán, Ecuador";
 
   return `<!DOCTYPE html>
 <html><body style="margin:0; padding:24px; background:${COLORS.cream};">
@@ -44,69 +50,132 @@ function wrap(body: string): string {
       ${body}
     </td></tr>
     <tr><td style="padding:16px 32px; background:${COLORS.cream}; color:${COLORS.muted}; font-size:11px; text-align:center; border-top:1px solid ${COLORS.border};">
-      Vía El Carrizal, Parroquia Urbina, Tulcán, Ecuador<br/>
+      ${footerText}<br/>
       info@fincalaclementina.com · WhatsApp +593 99 966 0252
     </td></tr>
   </table>
 </body></html>`;
 }
 
-/**
- * Email que recibe el visitante como confirmación.
- */
-export function clientConfirmationEmail(data: LeadEmailData): {
-  subject: string;
-  html: string;
-} {
-  const subject = "Recibimos tu solicitud — Finca La Clementina";
+// ============ COPY POR IDIOMA ============
+
+const CLIENT_COPY = {
+  es: {
+    subject: "Recibimos tu solicitud — Finca La Clementina",
+    greeting: (name: string) => `¡Gracias por escribirnos, ${name}!`,
+    intro:
+      "Recibimos tu solicitud y nuestro equipo se va a poner en contacto contigo muy pronto para conversar los detalles.",
+    whatsappPrompt: (link: string) =>
+      `Mientras tanto, puedes escribirnos directamente por WhatsApp al ${link} si tienes cualquier pregunta.`,
+    summary: "Resumen de tu solicitud",
+    row: {
+      event: "Tipo de evento",
+      date: "Fecha tentativa",
+      guests: "Invitados estimados",
+    },
+    closing: "Un abrazo,",
+    team: "Equipo Finca La Clementina",
+  },
+  en: {
+    subject: "We received your request — Finca La Clementina",
+    greeting: (name: string) => `Thanks for reaching out, ${name}!`,
+    intro:
+      "We received your request and our team will contact you very soon to discuss the details.",
+    whatsappPrompt: (link: string) =>
+      `In the meantime, you can message us directly on WhatsApp at ${link} if you have any questions.`,
+    summary: "Your request summary",
+    row: {
+      event: "Event type",
+      date: "Preferred date",
+      guests: "Estimated guests",
+    },
+    closing: "Warmly,",
+    team: "Finca La Clementina Team",
+  },
+};
+
+const INTERNAL_COPY = {
+  subject: (name: string, eventType: string | null) =>
+    `Nuevo lead: ${name}${eventType ? " · " + eventType : ""}`,
+  title: "Nueva solicitud desde el sitio",
+  intro: "Recibimos un lead nuevo a través del formulario de contacto.",
+  row: {
+    name: "Nombre",
+    email: "Correo",
+    phone: "Teléfono / WhatsApp",
+    event: "Tipo de evento",
+    date: "Fecha tentativa",
+    guests: "Invitados estimados",
+    locale: "Idioma del visitante",
+    message: "Mensaje",
+  },
+  reply: "Responde directamente a este email para contactar al cliente.",
+};
+
+// ============ EMAIL: confirmación al cliente ============
+
+export function clientConfirmationEmail(
+  data: LeadEmailData,
+  locale: EmailLocale = "es",
+): { subject: string; html: string } {
+  const t = CLIENT_COPY[locale];
+  const firstName = data.full_name.split(" ")[0];
+  const whatsappLink = `<a href="https://wa.me/593999660252" style="color:${COLORS.primary};">+593 99 966 0252</a>`;
+
   const body = `
-    <h2 style="font-family:Georgia, serif; font-size:22px; color:${COLORS.primary}; margin:0 0 16px;">¡Gracias por escribirnos, ${escapeHtml(data.full_name.split(" ")[0])}!</h2>
-    <p style="margin:0 0 16px;">Recibimos tu solicitud y nuestro equipo se va a poner en contacto contigo muy pronto para conversar los detalles.</p>
-    <p style="margin:0 0 24px;">Mientras tanto, puedes escribirnos directamente por WhatsApp al <a href="https://wa.me/593999660252" style="color:${COLORS.primary};">+593 99 966 0252</a> si tienes cualquier pregunta.</p>
+    <h2 style="font-family:Georgia, serif; font-size:22px; color:${COLORS.primary}; margin:0 0 16px;">${t.greeting(escapeHtml(firstName))}</h2>
+    <p style="margin:0 0 16px;">${t.intro}</p>
+    <p style="margin:0 0 24px;">${t.whatsappPrompt(whatsappLink)}</p>
 
     <table cellpadding="0" cellspacing="0" border="0" style="width:100%; background:${COLORS.cream}; border-radius:8px; margin:0 0 24px;">
       <tr><td style="padding:16px;">
-        <p style="margin:0 0 8px; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:${COLORS.muted};">Resumen de tu solicitud</p>
-        ${row("Tipo de evento", data.event_type)}
-        ${row("Fecha tentativa", data.desired_date)}
-        ${row("Invitados estimados", data.guests?.toString() ?? null)}
+        <p style="margin:0 0 8px; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:${COLORS.muted};">${t.summary}</p>
+        ${row(t.row.event, data.event_type)}
+        ${row(t.row.date, data.desired_date)}
+        ${row(t.row.guests, data.guests?.toString() ?? null)}
         ${data.message ? `<p style="margin:8px 0 0; font-size:13px;"><em>"${escapeHtml(data.message)}"</em></p>` : ""}
       </td></tr>
     </table>
 
-    <p style="margin:0; font-size:13px; color:${COLORS.muted};">Un abrazo,<br/>Equipo Finca La Clementina</p>
+    <p style="margin:0; font-size:13px; color:${COLORS.muted};">${t.closing}<br/>${t.team}</p>
   `;
-  return { subject, html: wrap(body) };
+
+  return { subject: t.subject, html: wrap(body, locale) };
 }
 
-/**
- * Email que recibe el responsable de la finca con el lead nuevo.
- */
-export function leadNotificationEmail(data: LeadEmailData): {
-  subject: string;
-  html: string;
-} {
-  const subject = `Nuevo lead: ${data.full_name}${data.event_type ? " · " + data.event_type : ""}`;
+// ============ EMAIL: notificación interna ============
+
+export function leadNotificationEmail(
+  data: LeadEmailData,
+  locale: EmailLocale = "es",
+): { subject: string; html: string } {
+  const t = INTERNAL_COPY;
+  const localeLabel = locale === "en" ? "Inglés (visitante extranjero)" : "Español";
+
   const body = `
-    <h2 style="font-family:Georgia, serif; font-size:22px; color:${COLORS.primary}; margin:0 0 16px;">Nueva solicitud desde el sitio</h2>
-    <p style="margin:0 0 24px;">Recibimos un lead nuevo a través del formulario de contacto.</p>
+    <h2 style="font-family:Georgia, serif; font-size:22px; color:${COLORS.primary}; margin:0 0 16px;">${t.title}</h2>
+    <p style="margin:0 0 8px;">${t.intro}</p>
+    <p style="margin:0 0 24px; font-size:12px; color:${COLORS.muted};"><strong>${t.row.locale}:</strong> ${localeLabel}</p>
 
     <table cellpadding="0" cellspacing="0" border="0" style="width:100%; border:1px solid ${COLORS.border}; border-radius:8px;">
       <tr><td style="padding:16px;">
-        ${row("Nombre", data.full_name)}
-        ${row("Correo", `<a href="mailto:${escapeHtml(data.email)}" style="color:${COLORS.primary};">${escapeHtml(data.email)}</a>`)}
-        ${row("Teléfono / WhatsApp", data.phone ? `<a href="https://wa.me/${data.phone.replace(/\\D/g, "")}" style="color:${COLORS.primary};">${escapeHtml(data.phone)}</a>` : null)}
-        ${row("Tipo de evento", data.event_type)}
-        ${row("Fecha tentativa", data.desired_date)}
-        ${row("Invitados estimados", data.guests?.toString() ?? null)}
-        ${data.message ? `<p style="margin:12px 0 0; padding-top:12px; border-top:1px solid ${COLORS.border}; font-size:13px;"><strong>Mensaje:</strong><br/>${escapeHtml(data.message).replace(/\\n/g, "<br/>")}</p>` : ""}
+        ${row(t.row.name, data.full_name)}
+        ${row(t.row.email, `<a href="mailto:${escapeHtml(data.email)}" style="color:${COLORS.primary};">${escapeHtml(data.email)}</a>`)}
+        ${row(t.row.phone, data.phone ? `<a href="https://wa.me/${data.phone.replace(/\D/g, "")}" style="color:${COLORS.primary};">${escapeHtml(data.phone)}</a>` : null)}
+        ${row(t.row.event, data.event_type)}
+        ${row(t.row.date, data.desired_date)}
+        ${row(t.row.guests, data.guests?.toString() ?? null)}
+        ${data.message ? `<p style="margin:12px 0 0; padding-top:12px; border-top:1px solid ${COLORS.border}; font-size:13px;"><strong>${t.row.message}:</strong><br/>${escapeHtml(data.message).replace(/\n/g, "<br/>")}</p>` : ""}
       </td></tr>
     </table>
 
-    <p style="margin:24px 0 0; font-size:13px; color:${COLORS.muted};">Responde directamente a este email para contactar al cliente.</p>
+    <p style="margin:24px 0 0; font-size:13px; color:${COLORS.muted};">${t.reply}</p>
   `;
-  return { subject, html: wrap(body) };
+
+  return { subject: t.subject(data.full_name, data.event_type), html: wrap(body, "es") };
 }
+
+// ============ HELPERS ============
 
 function row(label: string, value: string | null): string {
   if (!value) return "";

@@ -73,6 +73,8 @@ export const messages: Record<Locale, Messages> = {
     "footer.privacy": "Privacidad",
     "footer.terms": "Términos",
     "footer.cookies": "Cookies",
+    "footer.recaptcha":
+      "Protegido por reCAPTCHA. Aplican la Política de Privacidad y los Términos de Servicio de Google.",
 
     // ============ LA FINCA ============
     "lafinca.hero.eyebrow": "La Finca · Carchi, Ecuador",
@@ -375,6 +377,8 @@ export const messages: Record<Locale, Messages> = {
     "footer.privacy": "Privacy",
     "footer.terms": "Terms",
     "footer.cookies": "Cookies",
+    "footer.recaptcha":
+      "Protected by reCAPTCHA. Google's Privacy Policy and Terms of Service apply.",
 
     // ============ THE VENUE (LA FINCA) ============
     "lafinca.hero.eyebrow": "The Venue · Carchi, Ecuador",

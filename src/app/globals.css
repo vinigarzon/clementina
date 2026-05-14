@@ -98,6 +98,14 @@
   }
 }
 
+/* Oculta el badge de reCAPTCHA en todas las páginas.
+   Google permite ocultarlo SIEMPRE QUE el sitio muestre el aviso
+   "Protegido por reCAPTCHA" + links a Privacy Policy / Terms of Service
+   en un lugar visible. Ese aviso lo mostramos en el footer. */
+.grecaptcha-badge {
+  visibility: hidden !important;
+}
+
 @layer utilities {
   @keyframes cookieEnter {
     from {
